@@ -14,15 +14,22 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.os_manager import ChromeType
+
 
 # --- Cache Selenium WebDriver ---
 @st.cache_resource
 def get_driver():
-    """Initialize Selenium WebDriver (cached for performance)."""
-    options = Options()
-    options.add_argument('--headless')
-    options.add_argument('--disable-gpu')
-    return webdriver.Chrome(service=Service(ChromeDriverManager(chrome_type=.CHROMIUM).install()), options=options)
+    return webdriver.Chrome(
+        service=Service(
+            ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
+        ),
+        options=options,
+    )
+
+options = Options()
+options.add_argument("--disable-gpu")
+options.add_argument("--headless")
 
 # --- Validate Bank Account Format ---
 def is_valid_account(account):
