@@ -15,9 +15,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-
-# --- Get Selenium WebDriver ---
+# --- Cache Selenium WebDriver ---
+@st.cache_resource
 def get_driver():
+    """Initialize Selenium WebDriver (cached for performance)."""
     options = Options()
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
@@ -25,16 +26,13 @@ def get_driver():
     options.add_argument('--disable-dev-shm-usage')
     return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
-
 # --- Validate Bank Account Format ---
 def is_valid_account(account):
     return bool(re.match(r'^[0-9/-]+$', str(account))) if account else False
 
-
 # --- Split into Batches (2 DIČs per Batch) ---
 def split_into_batches(lst, batch_size=2):
     return [lst[i:i + batch_size] for i in range(0, len(lst), batch_size)]
-
 
 # --- Fetch "Nespolehlivý plátce" Status ---
 def fetch_nespolehlivy(driver, batch_size):
@@ -47,7 +45,6 @@ def fetch_nespolehlivy(driver, batch_size):
             status = "NEZNÁMÝ"
         nespolehlivy_list.append(status)
     return nespolehlivy_list
-
 
 # --- Format Excel File ---
 def format_excel(output_filename):
@@ -62,7 +59,6 @@ def format_excel(output_filename):
     for col in ws.columns:
         ws.column_dimensions[get_column_letter(col[0].column)].width = max(len(str(cell.value)) for cell in col) + 2
     wb.save(output_filename)
-
 
 # --- Process Uploaded File ---
 def process_file(uploaded_file):
@@ -147,17 +143,7 @@ def process_file(uploaded_file):
             bank_account = str(row["Bankovní účet"])
             company_name = str(row["Název firmy nebo jméno osoby"])
 
-            if scraped_accounts is None:
-                account_check_result = "Nenalezen účet"
-
-            elif not is_valid_account(bank_account):
-                account_check_result = "Chyba zadání"
-
-            elif bank_account in scraped_accounts:
-                account_check_result = "✔"
-
-            else:
-                account_check_result = "Neshoda účtu"
+            account_check_result = "✔" if bank_account in scraped_accounts else "Neshoda účtu" if scraped_accounts else "Nenalezen účet"
 
             new_ws.append([dic_number, bank_account, company_name, account_check_result, nespolehlivy_list[i]])
 
@@ -166,25 +152,17 @@ def process_file(uploaded_file):
     format_excel(output_filename)
     return output_filename
 
-
-# --- Streamlit UI ---
+# --- Main Function ---
 def main():
+    st.set_page_config(page_title="🔍 DPH Kontrola Účtů", page_icon="✅", layout="centered")
     st.title("🔍 DPH Kontrola Účtů")
+    st.markdown("📂 Nahrajte Excel soubor s DIČ a bankovními účty ke kontrole.")
 
     uploaded_file = st.file_uploader("📂 Nahrajte Excel soubor", type=["xlsx"])
+    if uploaded_file and st.button("🔍 Spustit kontrolu"):
+        with st.spinner("⏳ Zpracovávám data..."):
+            process_file(uploaded_file)
 
-    if uploaded_file is not None:
-        if st.button("🔍 Spustit kontrolu"):
-            with st.spinner("⏳ Zpracovávám data..."):
-                output_filename = process_file(uploaded_file)
-                if output_filename:
-                    st.success(f"✅ Kontrola dokončena! Výsledky uloženy: {output_filename}")
-                    with open(output_filename, "rb") as file:
-                        st.download_button(label="📥 Stáhnout výsledky",
-                                           data=file,
-                                           file_name=output_filename,
-                                           mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-
-
+# --- Run Main Function ---
 if __name__ == "__main__":
     main()
