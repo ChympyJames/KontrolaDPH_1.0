@@ -163,8 +163,8 @@ def process_file(uploaded_file):
 
      # --- Main Function ---
 def main():
-    st.set_page_config(page_title="🔍 DPH Kontrola Účtů", page_icon="✅", layout="centered")
-    st.title("🔍 DPH Kontrola Účtů")
+    st.set_page_config(page_title="🔍 Kontrol účtů pro účely DPH 🔍", page_icon="✅", layout="centered")
+    st.title("🔍 Kontrol účtů pro účely DPH 🔍")
     st.markdown("📂 Nahrajte Excel soubor s DIČ a bankovními účty ke kontrole.")
 
     uploaded_file = st.file_uploader("📂 Nahrajte Excel soubor", type=["xlsx"])
