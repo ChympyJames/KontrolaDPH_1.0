@@ -160,8 +160,6 @@ def process_file(uploaded_file):
 
             # Append data to the output file
             new_ws.append([dic_number, bank_account, company_name, account_check_result, nespolehlivy_list[i]])
- 
-             new_ws.append([dic_number, bank_account, company_name, account_check_result, nespolehlivy_list[i]])
 
     driver.quit()
     new_wb.save(output_filename)
