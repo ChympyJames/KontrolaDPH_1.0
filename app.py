@@ -73,7 +73,7 @@ def process_file(uploaded_file):
     df = pd.read_excel(uploaded_file, dtype={"Číslo bank. účtu": str, "Směr.kód": str})
 
     if df.empty:
-        st.error("⚠️ Excel file is empty or invalid.")
+        st.error("⚠️ S Excel souborem je něco špatně.")
         return None
 
     # Apply filtering (PREVOD + DIČ starts with "CZ")
@@ -141,8 +141,8 @@ def process_file(uploaded_file):
         percentage_done = int(((batch_idx + 1) / total_batches) * 100)
 
         # Update UI
-        status_text.text(f"🔍 Processing Batch {batch_idx+1}/{total_batches} | DIČ: {current_dic}")
-        time_text.text(f"⏳ Estimated Time Left: {estimated_time_left:.2f} sec")
+        status_text.text(f"🔍 Zpracovávám várku: {batch_idx+1}/{total_batches} | DIČ: {current_dic}")
+        time_text.text(f"⏳ Zbývá: {estimated_time_left:.2f} sec")
         progress_bar.progress(percentage_done / 100)
 
         # Match & Save Results
@@ -160,19 +160,60 @@ def process_file(uploaded_file):
     format_excel(output_filename)
     return output_filename
 
+def add_background():
+    st.markdown(
+        """
+        <style>
+        @keyframes moveShapes {
+            0% { transform: translateY(0px); opacity: 1; }
+            50% { transform: translateY(-20px); opacity: 0.8; }
+            100% { transform: translateY(0px); opacity: 1; }
+        }
+        
+        .shapes {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: moveShapes 5s infinite ease-in-out alternate;
+        }
+
+        .shape1 { width: 100px; height: 100px; top: 20%; left: 10%; animation-duration: 4s; }
+        .shape2 { width: 80px; height: 80px; top: 50%; left: 70%; animation-duration: 6s; }
+        .shape3 { width: 120px; height: 120px; top: 80%; left: 30%; animation-duration: 7s; }
+        .shape4 { width: 90px; height: 90px; top: 10%; left: 50%; animation-duration: 5s; }
+        
+        </style>
+        <div class="shapes">
+            <div class="shape shape1"></div>
+            <div class="shape shape2"></div>
+            <div class="shape shape3"></div>
+            <div class="shape shape4"></div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 # --- Main Function ---
 def main():
     st.set_page_config(page_title="🔍Kontrola zveřejněných účtů🔍", page_icon="✅", layout="centered")
     st.title("🔍Kontrola zveřejněných účtů🔍")
-    st.markdown("📂 Nahrajte Excel soubor s DIČ a bankovními účty ke kontrole.")
 
-    uploaded_file = st.file_uploader("📂 Nahrajte Excel soubor", type=["xlsx"])
+    uploaded_file = st.file_uploader("📂 Nahrajte Excel soubor s DIČ a bankovními účty ke kontrole", type=["xlsx"])
     if uploaded_file and st.button("🔍 Spustit kontrolu"):
         with st.spinner("⏳ Zpracovávám data..."):
             process_file(uploaded_file)
 
      # --- Main Function ---
 def main():
+    add_background()
     st.set_page_config(page_title="🔍 DPH Kontrola Účtů", page_icon="✅", layout="centered")
     st.title("🔍 DPH Kontrola Účtů")
     st.markdown("📂 Nahrajte Excel soubor s DIČ a bankovními účty ke kontrole.")
