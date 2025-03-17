@@ -201,16 +201,6 @@ def add_background():
         unsafe_allow_html=True
     )
 
-# --- Main Function ---
-def main():
-    st.set_page_config(page_title="🔍Kontrola zveřejněných účtů🔍", page_icon="✅", layout="centered")
-    st.title("🔍Kontrola zveřejněných účtů🔍")
-
-    uploaded_file = st.file_uploader("📂 Nahrajte Excel soubor s DIČ a bankovními účty ke kontrole", type=["xlsx"])
-    if uploaded_file and st.button("🔍 Spustit kontrolu"):
-        with st.spinner("⏳ Zpracovávám data..."):
-            process_file(uploaded_file)
-
      # --- Main Function ---
 def main():
     add_background()
