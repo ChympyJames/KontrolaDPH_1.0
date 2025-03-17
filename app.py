@@ -153,11 +153,10 @@ def process_file(uploaded_file):
 
             if not is_valid_account(bank_account):
                 account_check_result = "Chyba zadání"
-            elif scraped_accounts:
-                account_check_result = "✔" if bank_account in scraped_accounts else "Neshoda účtů"
+            elif scraped_accounts is None or len(scraped_accounts) == 0:
+                account_check_result = "Nenalezen účet"  # Fix: Mark as "Nenalezen účet" if no accounts are found
             else:
-                account_check_result = "Nenalezen účet"
-
+                account_check_result = "✔" if bank_account in scraped_accounts else "Neshoda účtů"
             # Append data to the output file
             new_ws.append([dic_number, bank_account, company_name, account_check_result, nespolehlivy_list[i]])
 
