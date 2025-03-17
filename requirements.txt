@@ -3,5 +3,4 @@ selenium
 openpyxl
 webdriver-manager
 chromium
-chromium-driver
 streamlit
