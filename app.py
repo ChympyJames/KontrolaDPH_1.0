@@ -20,16 +20,15 @@ from webdriver_manager.core.os_manager import ChromeType
 # --- Cache Selenium WebDriver ---
 @st.cache_resource
 def get_driver():
-    return webdriver.Chrome(
-        service=Service(
-            ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
-        ),
-        options=options,
-    )
+    options = Options()
+    options.add_argument('--headless')  # Mandatory for Streamlit Cloud
+    options.add_argument('--disable-gpu')
+    options.add_argument('--no-sandbox')  # Required for running in a container
+    options.add_argument('--disable-dev-shm-usage')  # Prevent crashes on low memory
 
-options = Options()
-options.add_argument("--disable-gpu")
-options.add_argument("--headless")
+    service = Service(ChromeDriverManager().install())  # Auto-manage ChromeDriver
+    driver = webdriver.Chrome(service=service, options=options)
+    return driver
 
 # --- Validate Bank Account Format ---
 def is_valid_account(account):
