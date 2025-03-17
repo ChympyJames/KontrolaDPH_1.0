@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import re
 import time
+import shutil
 from datetime import datetime
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
@@ -21,12 +22,18 @@ from webdriver_manager.core.os_manager import ChromeType
 @st.cache_resource
 def get_driver():
     options = Options()
-    options.add_argument('--headless')  # Mandatory for Streamlit Cloud
+    options.add_argument('--headless')
     options.add_argument('--disable-gpu')
-    options.add_argument('--no-sandbox')  # Required for running in a container
-    options.add_argument('--disable-dev-shm-usage')  # Prevent crashes on low memory
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
 
-    service = Service(ChromeDriverManager().install())  # Auto-manage ChromeDriver
+    # Locate system-installed ChromeDriver
+    chromedriver_path = shutil.which("chromedriver")
+    if not chromedriver_path:
+        st.error("❌ ChromeDriver not found. Ensure it's installed via `packages.txt`.")
+        return None
+
+    service = Service(chromedriver_path)
     driver = webdriver.Chrome(service=service, options=options)
     return driver
 
