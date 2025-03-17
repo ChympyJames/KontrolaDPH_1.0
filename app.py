@@ -171,6 +171,16 @@ def main():
         with st.spinner("⏳ Zpracovávám data..."):
             process_file(uploaded_file)
 
+     if output_filename:
+            st.success(f"✅ Kontrola dokončena! Výsledky uloženy jako: {output_filename}")
+
+            # Open the file and provide a download button
+            with open(output_filename, "rb") as file:
+                st.download_button(
+                    label="📥 Stáhnout výsledky",
+                    data=file,
+                    file_name=output_filename,
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 # --- Run Main Function ---
 if __name__ == "__main__":
     main()
