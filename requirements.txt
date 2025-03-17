@@ -1,6 +1,4 @@
 pandas
 selenium
 openpyxl
-chromium
-chromium-driver
 streamlit
