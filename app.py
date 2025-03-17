@@ -147,13 +147,23 @@ def process_file(uploaded_file):
 
         # Match & Save Results
         for i, dic_number in enumerate(batch):
-            row = df[df['DIČ'] == dic_number].iloc[0]
-            bank_account = str(row["Bankovní účet"])
-            company_name = str(row["Název firmy nebo jméno osoby"])
-
-            account_check_result = "✔" if bank_account in scraped_accounts else "Neshoda účtu" if scraped_accounts else "Nenalezen účet"
-
-            new_ws.append([dic_number, bank_account, company_name, account_check_result, nespolehlivy_list[i]])
+             row = df[df['DIČ'] == dic_number].iloc[0]
+             bank_account = str(row["Bankovní účet"])
+             company_name = str(row["Název firmy nebo jméno osoby"])
+ 
+             if scraped_accounts is None:
+                 account_check_result = "Nenalezen účet"
+ 
+             elif not is_valid_account(bank_account):
+                 account_check_result = "Chyba zadání"
+ 
+             elif bank_account in scraped_accounts:
+                 account_check_result = "✔"
+ 
+             else:
+                 account_check_result = "Neshoda účtu"
+ 
+             new_ws.append([dic_number, bank_account, company_name, account_check_result, nespolehlivy_list[i]])
 
     driver.quit()
     new_wb.save(output_filename)
