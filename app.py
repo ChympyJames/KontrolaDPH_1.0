@@ -171,7 +171,18 @@ def main():
         with st.spinner("⏳ Zpracovávám data..."):
             process_file(uploaded_file)
 
-     if output_filename:
+     # --- Main Function ---
+def main():
+    st.set_page_config(page_title="🔍 DPH Kontrola Účtů", page_icon="✅", layout="centered")
+    st.title("🔍 DPH Kontrola Účtů")
+    st.markdown("📂 Nahrajte Excel soubor s DIČ a bankovními účty ke kontrole.")
+
+    uploaded_file = st.file_uploader("📂 Nahrajte Excel soubor", type=["xlsx"])
+    if uploaded_file and st.button("🔍 Spustit kontrolu"):
+        with st.spinner("⏳ Zpracovávám data..."):
+            output_filename = process_file(uploaded_file)
+
+        if output_filename:
             st.success(f"✅ Kontrola dokončena! Výsledky uloženy jako: {output_filename}")
 
             # Open the file and provide a download button
@@ -180,7 +191,9 @@ def main():
                     label="📥 Stáhnout výsledky",
                     data=file,
                     file_name=output_filename,
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+
 # --- Run Main Function ---
 if __name__ == "__main__":
     main()
