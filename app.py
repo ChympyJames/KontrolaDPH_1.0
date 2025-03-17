@@ -146,22 +146,20 @@ def process_file(uploaded_file):
         progress_bar.progress(percentage_done / 100)
 
         # Match & Save Results
-        for i, dic_number in enumerate(batch):
-             row = df[df['DIČ'] == dic_number].iloc[0]
-             bank_account = str(row["Bankovní účet"])
-             company_name = str(row["Název firmy nebo jméno osoby"])
- 
-             if scraped_accounts is None:
-                 account_check_result = "Nenalezen účet"
- 
-             elif not is_valid_account(bank_account):
-                 account_check_result = "Chyba zadání"
- 
-             elif bank_account in scraped_accounts:
-                 account_check_result = "✔"
- 
-             else:
-                 account_check_result = "Neshoda účtu"
+                for i, dic_number in enumerate(batch):
+            row = df[df['DIČ'] == dic_number].iloc[0]
+            bank_account = str(row["Bankovní účet"])
+            company_name = str(row["Název firmy nebo jméno osoby"])
+
+            if not is_valid_account(bank_account):
+                account_check_result = "Chyba zadání"
+            elif scraped_accounts:
+                account_check_result = "✔" if bank_account in scraped_accounts else "Neshoda účtů"
+            else:
+                account_check_result = "Nenalezen účet"
+
+            # Append data to the output file
+            new_ws.append([dic_number, bank_account, company_name, account_check_result, nespolehlivy_list[i]])
  
              new_ws.append([dic_number, bank_account, company_name, account_check_result, nespolehlivy_list[i]])
 
