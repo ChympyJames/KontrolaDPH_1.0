@@ -146,7 +146,7 @@ def process_file(uploaded_file):
         progress_bar.progress(percentage_done / 100)
 
         # Match & Save Results
-                for i, dic_number in enumerate(batch):
+        for i, dic_number in enumerate(batch):
             row = df[df['DIČ'] == dic_number].iloc[0]
             bank_account = str(row["Bankovní účet"])
             company_name = str(row["Název firmy nebo jméno osoby"])
