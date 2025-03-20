@@ -224,12 +224,17 @@ def main():
 
             # Open the file and provide a download button
             with open(output_filename, "rb") as file:
-                st.download_button(
+                if st.download_button(
                     label="📥 Stáhnout výsledky",
                     data=file,
                     file_name=output_filename,
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
+                ):
+                    st.success("✅ Aplikace se resetuje...")
+                    driver.quit()  # Optional safety if not already quit, if driver is global
+                    st.cache_resource.clear()  # Clear cached resources (like Selenium driver)
+                    st.experimental_rerun()    # Soft reboot the app
+
 
 
 # --- Run Main Function ---
