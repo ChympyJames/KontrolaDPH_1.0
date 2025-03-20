@@ -115,10 +115,6 @@ def process_file(uploaded_file):
         ".0$", "", regex=True)
     df["Bankovní účet"] = df["Číslo bank. účtu"] + "/" + df["Směr.kód"]
 
-    # Remove Duplicates
-    df = df.drop_duplicates(subset=["DIČ", "Bankovní účet"]).reset_index(
-        drop=True)
-
     # Initialize Output File
     output_filename = f"Kontrola_ucty_DPH_{datetime.now().strftime('%d-%m-%Y_%H%M')}.xlsx"
     new_wb = Workbook()
