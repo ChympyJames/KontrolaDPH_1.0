@@ -14,13 +14,16 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import gc
 
 
 # --- Cache Selenium WebDriver ---
+@st.cache_resource
 def get_driver():
     options = Options()
-
+    options.add_argument('--headless')
+    options.add_argument('--disable-gpu')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
 
     # Locate system-installed ChromeDriver
     chromedriver_path = shutil.which("chromedriver")
@@ -94,9 +97,9 @@ def process_file(uploaded_file):
         st.error("⚠️ S Excel souborem je něco špatně.")
         return None
 
-    # Filter rows where 'Forma úhrady' == 'PREVOD' and DIČ starts with 'CZ'
-    df = df[
-        (df['Forma úhrady'] == 'PREVOD') & (df['DIČ'].str.startswith('CZ'))]
+    # Apply filtering (PREVOD + DIČ starts with "CZ")
+    df = df[(df["Forma úhrady"] == "PREVOD") & (
+        df["DIČ"].astype(str).str.startswith("CZ", na=False))]
 
     df = df[
         (df['Stav úhrady dokladu'].isnull() | (df['Stav úhrady dokladu'].str.strip() == ''))]
@@ -104,11 +107,8 @@ def process_file(uploaded_file):
     # Format Bank Account
     df["Směr.kód"] = df["Směr.kód"].str.extract(r"(\d+)")[0].fillna(
         "0000").astype(str).str.zfill(4)
-    # Keep only valid prefix-account structures (numbers and dashes)
     df["Číslo bank. účtu"] = df["Číslo bank. účtu"].astype(str).str.extract(r"([\d\-]+)")[0]
-
     df["Bankovní účet"] = df["Číslo bank. účtu"] + "/" + df["Směr.kód"]
-
 
     # Initialize Output File
     output_filename = f"Kontrola_ucty_DPH_{datetime.now().strftime('%d-%m-%Y_%H%M')}.xlsx"
@@ -131,8 +131,9 @@ def process_file(uploaded_file):
 
     start_time = time.time()  # Start timing
 
-
     for batch_idx, batch in enumerate(dic_batches):
+        batch_size = len(batch)
+        current_dic = ", ".join(batch)
 
         driver.get("https://adisspr.mfcr.cz/dpr/DphReg")
 
@@ -171,8 +172,6 @@ def process_file(uploaded_file):
 
         percentage_done = int(((batch_idx + 1) / total_batches) * 100)
 
-        current_dic = ", ".join(batch)
-
         # Update UI
         status_text.text(
             f"🔍 Zpracovávám várku: {batch_idx + 1}/{total_batches} | DIČ: {current_dic}")
@@ -202,7 +201,6 @@ def process_file(uploaded_file):
                  nespolehlivy_list[i]])
 
     driver.quit()
-    gc.collect()
     new_wb.save(output_filename)
     format_excel(output_filename)
     return output_filename
