@@ -105,6 +105,9 @@ def process_file(uploaded_file):
     df = df[(df["Forma úhrady"] == "PREVOD") & (
         df["DIČ"].astype(str).str.startswith("CZ", na=False))]
 
+    df = df[
+        (df['Stav úhrady dokladu'].isnull() | (df['Stav úhrady dokladu'].str.strip() == ''))]
+
     # Format Bank Account
     df["Směr.kód"] = df["Směr.kód"].str.extract(r"(\d+)")[0].fillna(
         "0000").astype(str).str.zfill(4)
