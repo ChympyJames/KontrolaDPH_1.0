@@ -52,7 +52,6 @@ def fetch_nespolehlivy(driver):
     try:
         # Get all text content from the page
         body_text = driver.find_element(By.TAG_NAME, "body").text
-        print("DEBUG: Full page text:\n", body_text)
 
         # Look for the line that contains 'Nespolehlivý plátce:'
         for line in body_text.split('\n'):
@@ -61,15 +60,12 @@ def fetch_nespolehlivy(driver):
                 parts = line.split(':')
                 if len(parts) >= 2:
                     status = parts[1].strip().upper()
-                    print(
-                        f"DEBUG: Found status line: {line} | Extracted status: {status}")
                     return [status]
 
         # If not found in the lines
         return ["NEZNÁMÝ"]
 
     except Exception as e:
-        print(f"Error fetching nespolehlivý: {e}")
         return ["NEZNÁMÝ"]
 
 
@@ -111,8 +107,7 @@ def process_file(uploaded_file):
     # Format Bank Account
     df["Směr.kód"] = df["Směr.kód"].str.extract(r"(\d+)")[0].fillna(
         "0000").astype(str).str.zfill(4)
-    df["Číslo bank. účtu"] = df["Číslo bank. účtu"].astype(str).str.replace(
-        ".0$", "", regex=True)
+    df["Číslo bank. účtu"] = df["Číslo bank. účtu"].astype(str).str.extract(r"([\d\-]+)")[0]
     df["Bankovní účet"] = df["Číslo bank. účtu"] + "/" + df["Směr.kód"]
 
     # Initialize Output File
