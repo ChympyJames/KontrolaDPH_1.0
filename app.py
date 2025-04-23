@@ -205,8 +205,13 @@ def process_file(uploaded_file):
     format_excel(output_filename)
     return output_filename
 
-    # --- Main Function ---
-
+def reset_app():
+    try:
+        driver.quit()
+    except Exception:
+        pass
+    st.cache_resource.clear()
+    st.cache_data.clear()
 
 def main():
     st.set_page_config(page_title="🔍 Kontrol účtů pro účely DPH 🔍",
@@ -232,9 +237,7 @@ def main():
                 ):
                     st.success("✅ Aplikace se resetuje...")
                     driver.quit()  # Optional safety if not already quit, if driver is global
-                    st.cache_resource.clear()  # Clear cached resources (like Selenium driver)
-                    st.experimental_rerun()    # Soft reboot the app
-
+                    reset_app()   # Soft reboot the app
 
 
 # --- Run Main Function ---
