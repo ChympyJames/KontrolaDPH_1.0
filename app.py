@@ -212,6 +212,8 @@ def reset_app():
         pass
     st.cache_resource.clear()
     st.cache_data.clear()
+    st.session_state.reset_after_download = False
+    st.experimental_rerun()
 
 def main():
     st.set_page_config(page_title="🔍 Kontrol účtů pro účely DPH 🔍",
