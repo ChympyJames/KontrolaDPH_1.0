@@ -15,9 +15,6 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-
-# --- Cache Selenium WebDriver ---
-@st.cache_resource
 def get_driver():
     options = Options()
     options.add_argument('--headless')
@@ -210,7 +207,6 @@ def reset_app():
         driver.quit()
     except Exception:
         pass
-    st.cache_resource.clear()
     st.cache_data.clear()
     st.session_state.reset_after_download = False
     st.experimental_rerun()
